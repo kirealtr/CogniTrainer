@@ -48,7 +48,7 @@ def send_bias(request):
             context["success"] = True
             context["comment"] = "Карточка успешно добавлена."
 
-        return render(request, "bias_request.html", context)
+        return render(request, "submit_result.html", context)
 
     return render(request, "bias_add.html")
 
