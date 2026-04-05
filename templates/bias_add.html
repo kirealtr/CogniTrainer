@@ -8,14 +8,14 @@
 
 {% block content %}
 <div class="form-card">
-    <form action="/send-term" method="post">
+    <form action="/send-bias" method="post">
         {% csrf_token %}
 
         <label for="name">Твоё имя</label>
         <input type="text" id="name" name="name" placeholder="Например, Анна">
 
-        <label for="new_term">Название искажения</label>
-        <input type="text" id="new_term" name="new_term" placeholder="Например, Ошибка подтверждения" required>
+        <label for="new_bias">Название искажения</label>
+        <input type="text" id="new_bias" name="new_bias" placeholder="Например, Ошибка подтверждения" required>
 
         <label for="new_definition">Объяснение</label>
         <textarea id="new_definition" name="new_definition" rows="4" placeholder="Кратко объясни, в чём состоит ошибка мышления" required></textarea>

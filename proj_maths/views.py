@@ -1,24 +1,24 @@
 from django.shortcuts import render
-from . import terms_work
+from . import biases_work
 
 
 def index(request):
     return render(request, "index.html")
 
 
-def terms_list(request):
-    terms = terms_work.get_terms_for_table()
-    return render(request, "term_list.html", context={"terms": terms})
+def biases_list(request):
+    biases = biases_work.get_biases_for_table()
+    return render(request, "bias_list.html", context={"biases": biases})
 
 
-def add_term(request):
-    return render(request, "term_add.html")
+def add_bias(request):
+    return render(request, "bias_add.html")
 
 
-def send_term(request):
+def send_bias(request):
     if request.method == "POST":
         user_name = request.POST.get("name", "").strip()
-        title = request.POST.get("new_term", "").strip()
+        title = request.POST.get("new_bias", "").strip()
         description = request.POST.get("new_definition", "").strip()
         example = request.POST.get("example", "").strip()
         tip = request.POST.get("tip", "").strip()
@@ -44,22 +44,22 @@ def send_term(request):
             context["success"] = False
             context["comment"] = "Совет должен содержать минимум 10 символов."
         else:
-            terms_work.write_term(title, description, example, tip)
+            biases_work.write_bias(title, description, example, tip)
             context["success"] = True
             context["comment"] = "Карточка успешно добавлена."
 
-        return render(request, "term_request.html", context)
+        return render(request, "bias_request.html", context)
 
-    return render(request, "term_add.html")
+    return render(request, "bias_add.html")
 
 
 def show_stats(request):
-    stats = terms_work.get_terms_stats()
+    stats = biases_work.get_biases_stats()
     return render(request, "stats.html", stats)
 
 
 def quiz_view(request):
-    questions = terms_work.get_quiz_questions()
+    questions = biases_work.get_quiz_questions()
 
     if request.method == "POST":
         user_name = request.POST.get("user_name", "").strip()

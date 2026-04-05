@@ -1,9 +1,9 @@
 from math import ceil
 
 
-def get_terms_for_table():
-    terms = []
-    with open("./data/terms.csv", "r", encoding="utf-8") as file:
+def get_biases_for_table():
+    biases = []
+    with open("./data/biases.csv", "r", encoding="utf-8") as file:
         lines = file.readlines()[1:]
 
     count = 1
@@ -12,34 +12,34 @@ def get_terms_for_table():
         if not line:
             continue
         title, description, example, tip, source = line.split(";")
-        terms.append([count, title, description, example, tip, source])
+        biases.append([count, title, description, example, tip, source])
         count += 1
 
-    return terms
+    return biases
 
 
-def write_term(title, description, example, tip):
+def write_bias(title, description, example, tip):
     new_line = f"{title};{description};{example};{tip};user"
 
-    with open("./data/terms.csv", "r", encoding="utf-8") as file:
+    with open("./data/biases.csv", "r", encoding="utf-8") as file:
         existing_lines = [line.strip("\n") for line in file.readlines()]
 
     header = existing_lines[0]
-    old_terms = existing_lines[1:]
-    updated_terms = old_terms + [new_line]
-    updated_terms.sort()
+    old_biases = existing_lines[1:]
+    updated_biases = old_biases + [new_line]
+    updated_biases.sort()
 
-    with open("./data/terms.csv", "w", encoding="utf-8") as file:
-        file.write("\n".join([header] + updated_terms))
+    with open("./data/biases.csv", "w", encoding="utf-8") as file:
+        file.write("\n".join([header] + updated_biases))
 
 
-def get_terms_stats():
-    db_terms = 0
-    user_terms = 0
+def get_biases_stats():
+    db_biases = 0
+    user_biases = 0
     description_lengths = []
     example_lengths = []
 
-    with open("./data/terms.csv", "r", encoding="utf-8") as file:
+    with open("./data/biases.csv", "r", encoding="utf-8") as file:
         lines = file.readlines()[1:]
 
     for line in lines:
@@ -52,17 +52,17 @@ def get_terms_stats():
         example_lengths.append(len(example.split()))
 
         if source == "user":
-            user_terms += 1
+            user_biases += 1
         elif source == "db":
-            db_terms += 1
+            db_biases += 1
 
-    total = db_terms + user_terms
+    total = db_biases + user_biases
 
     if total == 0:
         return {
-            "terms_all": 0,
-            "terms_own": 0,
-            "terms_added": 0,
+            "biases_all": 0,
+            "biases_own": 0,
+            "biases_added": 0,
             "words_avg": 0,
             "words_max": 0,
             "words_min": 0,
@@ -70,9 +70,9 @@ def get_terms_stats():
         }
 
     return {
-        "terms_all": total,
-        "terms_own": db_terms,
-        "terms_added": user_terms,
+        "biases_all": total,
+        "biases_own": db_biases,
+        "biases_added": user_biases,
         "words_avg": round(sum(description_lengths) / len(description_lengths), 1),
         "words_max": max(description_lengths),
         "words_min": min(description_lengths),
