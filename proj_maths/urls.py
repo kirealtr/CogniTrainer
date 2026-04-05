@@ -18,9 +18,11 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.index),
-    path('terms-list', views.terms_list),
-    path('add-term', views.add_term),
-    path('send-term', views.send_term),
-    path('stats', views.show_stats)
+    path("admin/", admin.site.urls),
+    path("", views.index, name="home"),
+    path("biases-list", views.biases_list, name="biases_list"),
+    path("add-bias", views.add_bias, name="add_bias"),
+    path("send-bias", views.send_bias, name="send_bias"),
+    path("stats", views.show_stats, name="stats"),
+    path("quiz", views.quiz_view, name="quiz"),
 ]

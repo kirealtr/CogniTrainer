@@ -1,45 +1,92 @@
 from django.shortcuts import render
-from django.core.cache import cache
-from . import biases_work
+from . import terms_work
 
 
 def index(request):
     return render(request, "index.html")
 
 
-def biases_list(request):
-    biases = biases_work.get_biases_for_table()
-    return render(request, "bias_list.html", context={"biases": biases})
+def terms_list(request):
+    terms = terms_work.get_terms_for_table()
+    return render(request, "term_list.html", context={"terms": terms})
 
 
-def add_bias(request):
-    return render(request, "bias_add.html")
+def add_term(request):
+    return render(request, "term_add.html")
 
 
-def send_bias(request):
+def send_term(request):
     if request.method == "POST":
-        cache.clear()
-        user_name = request.POST.get("name")
-        new_bias = request.POST.get("new_bias", "")
-        new_definition = request.POST.get("new_definition", "").replace(";", ",")
+        user_name = request.POST.get("name", "").strip()
+        title = request.POST.get("new_term", "").strip()
+        description = request.POST.get("new_definition", "").strip()
+        example = request.POST.get("example", "").strip()
+        tip = request.POST.get("tip", "").strip()
+
+        # Убираем символы-разделители CSV
+        title = title.replace(";", ",")
+        description = description.replace(";", ",")
+        example = example.replace(";", ",")
+        tip = tip.replace(";", ",")
+
         context = {"user": user_name}
-        if len(new_definition) == 0:
+
+        if len(title) < 3:
             context["success"] = False
-            context["comment"] = "Описание должно быть не пустым"
-        elif len(new_bias) == 0:
+            context["comment"] = "Название искажения должно содержать минимум 3 символа."
+        elif len(description) < 15:
             context["success"] = False
-            context["comment"] = "Термин должен быть не пустым"
+            context["comment"] = "Объяснение должно содержать минимум 15 символов."
+        elif len(example) < 15:
+            context["success"] = False
+            context["comment"] = "Пример должен содержать минимум 15 символов."
+        elif len(tip) < 10:
+            context["success"] = False
+            context["comment"] = "Совет должен содержать минимум 10 символов."
         else:
+            terms_work.write_term(title, description, example, tip)
             context["success"] = True
-            context["comment"] = "Ваш термин принят"
-            biases_work.write_bias(new_bias, new_definition)
-        if context["success"]:
-            context["success-title"] = ""
-        return render(request, "bias_request.html", context)
-    else:
-        add_bias(request)
+            context["comment"] = "Карточка успешно добавлена."
+
+        return render(request, "term_request.html", context)
+
+    return render(request, "term_add.html")
 
 
 def show_stats(request):
-    stats = biases_work.get_biases_stats()
+    stats = terms_work.get_terms_stats()
     return render(request, "stats.html", stats)
+
+
+def quiz_view(request):
+    questions = terms_work.get_quiz_questions()
+
+    if request.method == "POST":
+        user_name = request.POST.get("user_name", "").strip()
+        score = 0
+        results = []
+
+        for question in questions:
+            selected_answer = request.POST.get(f"question_{question['id']}", "")
+            is_correct = selected_answer == question["correct"]
+
+            if is_correct:
+                score += 1
+
+            results.append({
+                "question": question["question"],
+                "selected": selected_answer,
+                "correct": question["correct"],
+                "is_correct": is_correct,
+                "explanation": question["explanation"],
+            })
+
+        context = {
+            "user_name": user_name,
+            "score": score,
+            "total": len(questions),
+            "results": results,
+        }
+        return render(request, "quiz_result.html", context)
+
+    return render(request, "quiz.html", {"questions": questions})
