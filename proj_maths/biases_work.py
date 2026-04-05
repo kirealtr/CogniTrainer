@@ -1,27 +1,29 @@
-from math import ceil
+"""Business logic and data helpers for the Think Slow project."""
+
+from pathlib import Path
+
+DATA_FILE_PATH = Path("./data/biases.csv")
+
+NO_ANSWER_TEXT = "нет ответа"
+NO_PREFERENCE_TEXT = "безразлично"
 
 
 def get_biases_for_table():
+    """Return all bias cards formatted for table output."""
     biases = []
-    with open("./data/biases.csv", "r", encoding="utf-8") as file:
-        lines = file.readlines()[1:]
 
-    count = 1
-    for line in lines:
-        line = line.strip()
-        if not line:
-            continue
-        title, description, example, tip, source = line.split(";")
+    for count, parts in enumerate(_iter_bias_rows(), start=1):
+        title, description, example, tip, source = parts
         biases.append([count, title, description, example, tip, source])
-        count += 1
 
     return biases
 
 
 def write_bias(title, description, example, tip):
+    """Append a new user bias card to the CSV file."""
     new_line = f"{title};{description};{example};{tip};user"
 
-    with open("./data/biases.csv", "r", encoding="utf-8") as file:
+    with DATA_FILE_PATH.open("r", encoding="utf-8") as file:
         existing_lines = [line.strip("\n") for line in file.readlines()]
 
     header = existing_lines[0]
@@ -29,25 +31,19 @@ def write_bias(title, description, example, tip):
     updated_biases = old_biases + [new_line]
     updated_biases.sort()
 
-    with open("./data/biases.csv", "w", encoding="utf-8") as file:
+    with DATA_FILE_PATH.open("w", encoding="utf-8") as file:
         file.write("\n".join([header] + updated_biases))
 
 
 def get_biases_stats():
+    """Return summary statistics for all bias cards."""
     db_biases = 0
     user_biases = 0
     description_lengths = []
     example_lengths = []
 
-    with open("./data/biases.csv", "r", encoding="utf-8") as file:
-        lines = file.readlines()[1:]
-
-    for line in lines:
-        line = line.strip()
-        if not line:
-            continue
-
-        title, description, example, tip, source = line.split(";")
+    for parts in _iter_bias_rows():
+        _, description, example, _, source = parts
         description_lengths.append(len(description.split()))
         example_lengths.append(len(example.split()))
 
@@ -81,10 +77,14 @@ def get_biases_stats():
 
 
 def get_quiz_questions():
+    """Return quiz questions about cognitive biases."""
     return [
         {
             "id": 1,
-            "question": "Человек читает только те новости, которые подтверждают его прежнее мнение. Какое искажение здесь проявляется?",
+            "question": (
+                "Человек читает только те новости, которые подтверждают "
+                "его прежнее мнение. Какое искажение здесь проявляется?"
+            ),
             "options": [
                 "Ошибка подтверждения",
                 "Регрессия к среднему",
@@ -92,11 +92,18 @@ def get_quiz_questions():
                 "Эффект ореола",
             ],
             "correct": "Ошибка подтверждения",
-            "explanation": "Ошибка подтверждения — это склонность замечать и ценить только подтверждающую информацию.",
+            "explanation": (
+                "Ошибка подтверждения — это склонность замечать и ценить "
+                "только подтверждающую информацию."
+            ),
         },
         {
             "id": 2,
-            "question": "После того как товар сначала показали за 20 000 рублей, цена 12 000 кажется очень выгодной. Какое искажение проявляется?",
+            "question": (
+                "После того как товар сначала показали за 20 000 рублей, "
+                "цена 12 000 кажется очень выгодной. Какое искажение "
+                "проявляется?"
+            ),
             "options": [
                 "Эвристика доступности",
                 "Эффект якоря",
@@ -104,11 +111,17 @@ def get_quiz_questions():
                 "Иллюзия понимания",
             ],
             "correct": "Эффект якоря",
-            "explanation": "Первая увиденная цена становится якорем и влияет на дальнейшую оценку.",
+            "explanation": (
+                "Первая увиденная цена становится якорем и влияет "
+                "на дальнейшую оценку."
+            ),
         },
         {
             "id": 3,
-            "question": "Человек делает вывод о профессии по одной яркой истории, игнорируя общую статистику. Что это показывает?",
+            "question": (
+                "Человек делает вывод о профессии по одной яркой истории, "
+                "игнорируя общую статистику. Что это показывает?"
+            ),
             "options": [
                 "Игнорирование базовой частоты",
                 "Регрессия к среднему",
@@ -116,11 +129,18 @@ def get_quiz_questions():
                 "Ошибка выжившего",
             ],
             "correct": "Игнорирование базовой частоты",
-            "explanation": "Базовая частота — это общая статистика по явлению. Её игнорирование ведёт к плохим выводам.",
+            "explanation": (
+                "Базовая частота — это общая статистика по явлению. "
+                "Её игнорирование ведёт к плохим выводам."
+            ),
         },
         {
             "id": 4,
-            "question": "Человек изучает только истории успешных стартапов и решает, что почти все стартапы становятся прибыльными. Какое искажение здесь видно?",
+            "question": (
+                "Человек изучает только истории успешных стартапов и решает, "
+                "что почти все стартапы становятся прибыльными. "
+                "Какое искажение здесь видно?"
+            ),
             "options": [
                 "Ошибка выжившего",
                 "Эффект якоря",
@@ -128,11 +148,18 @@ def get_quiz_questions():
                 "Ошибка подтверждения",
             ],
             "correct": "Ошибка выжившего",
-            "explanation": "Видимы только успешные примеры, а неудачные остаются вне поля зрения.",
+            "explanation": (
+                "Видимы только успешные примеры, а неудачные остаются "
+                "вне поля зрения."
+            ),
         },
         {
             "id": 5,
-            "question": "После серии очень плохих результатов ученик показывает чуть лучший результат, даже без нового метода подготовки. Какой принцип это объясняет?",
+            "question": (
+                "После серии очень плохих результатов ученик показывает "
+                "чуть лучший результат, даже без нового метода подготовки. "
+                "Какой принцип это объясняет?"
+            ),
             "options": [
                 "Эвристика доступности",
                 "Регрессия к среднему",
@@ -140,11 +167,16 @@ def get_quiz_questions():
                 "Избыточная уверенность",
             ],
             "correct": "Регрессия к среднему",
-            "explanation": "Сильные отклонения часто сменяются более обычными значениями просто из-за статистики.",
+            "explanation": (
+                "Сильные отклонения часто сменяются более обычными "
+                "значениями просто из-за статистики."
+            ),
         },
     ]
-    
+
+
 def get_risk_games():
+    """Return risk-game scenarios for the prospect theory section."""
     return [
         {
             "id": 1,
@@ -160,7 +192,11 @@ def get_risk_games():
             "right_ev": 9000,
             "recommended": "А",
             "time_limit": 10,
-            "explanation": "Математическое ожидание у варианта А выше: 9 500 руб. против 9 000 руб. Но многие выбирают более надёжный вариант Б.",
+            "explanation": (
+                "Математическое ожидание у варианта А выше: 9 500 руб. "
+                "против 9 000 руб. Но многие выбирают более надёжный "
+                "вариант Б."
+            ),
             "lesson": "Высоковероятные выигрыши: интуиция часто избегает риска.",
         },
         {
@@ -177,7 +213,12 @@ def get_risk_games():
             "right_ev": -9000,
             "recommended": "Б",
             "time_limit": 10,
-            "explanation": "Математически вариант Б лучше: гарантированный убыток 9 000 меньше ожидаемого убытка 9 500 у варианта А. Но люди часто предпочитают рискнуть, чтобы избежать гарантированной потери.",
+            "explanation": (
+                "Математически вариант Б лучше: гарантированный убыток "
+                "9 000 меньше ожидаемого убытка 9 500 у варианта А. "
+                "Но люди часто предпочитают рискнуть, чтобы избежать "
+                "гарантированной потери."
+            ),
             "lesson": "Высоковероятные потери: интуиция часто ищет риск.",
         },
         {
@@ -194,7 +235,11 @@ def get_risk_games():
             "right_ev": 400,
             "recommended": "А",
             "time_limit": 10,
-            "explanation": "Ожидаемое значение у варианта А выше: 500 руб. против 400 руб. Здесь и интуиция, и математика часто совпадают в пользу шанса на большой приз.",
+            "explanation": (
+                "Ожидаемое значение у варианта А выше: 500 руб. "
+                "против 400 руб. Здесь и интуиция, и математика часто "
+                "совпадают в пользу шанса на большой приз."
+            ),
             "lesson": "Маловероятные выигрыши: люди часто переоценивают шанс крупного приза.",
         },
         {
@@ -211,7 +256,11 @@ def get_risk_games():
             "right_ev": -400,
             "recommended": "Б",
             "time_limit": 10,
-            "explanation": "Математически вариант Б лучше: потерять 400 гарантированно лучше, чем ожидаемо потерять 500. Но многие готовы переплатить, чтобы убрать даже маленький шанс крупной потери.",
+            "explanation": (
+                "Математически вариант Б лучше: потерять 400 гарантированно "
+                "лучше, чем ожидаемо потерять 500. Но многие готовы "
+                "переплатить, чтобы убрать даже маленький шанс крупной потери."
+            ),
             "lesson": "Маловероятные потери: люди часто переплачивают за полное устранение риска.",
         },
         {
@@ -229,7 +278,7 @@ def get_risk_games():
             "recommended": "Б",
             "time_limit": 10,
             "explanation": "Вариант Б лучше как интуитивно, так и математически.",
-            "lesson": "Нечастый случай, когда интуиция обычно дает правильный совет.",
+            "lesson": "Нечастый случай, когда интуиция обычно даёт правильный совет.",
         },
         {
             "id": 6,
@@ -243,12 +292,11 @@ def get_risk_games():
             "right_text": "100% потерять 9 500 руб.",
             "left_ev": -9500,
             "right_ev": -9500,
-            "recommended": "безразлично",
+            "recommended": NO_PREFERENCE_TEXT,
             "time_limit": 10,
             "explanation": "По ожиданию варианты равны. Разница только в форме риска.",
             "lesson": "При потерях люди часто тянутся к риску даже при равной математике.",
         },
-
         {
             "id": 7,
             "kind": "choice",
@@ -258,12 +306,18 @@ def get_risk_games():
             "left_label": "А",
             "right_label": "Б",
             "left_text": "верная прибыль 240 долларов",
-            "right_text": "25%-ный шанс выиграть 1000 долларов и 75%-ный шанс не выиграть ничего",
+            "right_text": (
+                "25%-ный шанс выиграть 1000 долларов и 75%-ный шанс "
+                "не выиграть ничего"
+            ),
             "left_ev": 240,
             "right_ev": 250,
             "recommended": "Б",
             "time_limit": 20,
-            "explanation": "Математическое ожидание у Б выше: 250 против 240. Но большинство людей предпочитает надёжную прибыль А.",
+            "explanation": (
+                "Математическое ожидание у Б выше: 250 против 240. "
+                "Но большинство людей предпочитает надёжную прибыль А."
+            ),
             "lesson": "Надёжный выигрыш психологически переоценивается.",
         },
         {
@@ -275,12 +329,18 @@ def get_risk_games():
             "left_label": "В",
             "right_label": "Г",
             "left_text": "верная потеря 750 долларов",
-            "right_text": "75%-ный шанс потерять 1000 долларов и 25%-ный шанс не потерять ничего",
+            "right_text": (
+                "75%-ный шанс потерять 1000 долларов и 25%-ный шанс "
+                "не потерять ничего"
+            ),
             "left_ev": -750,
             "right_ev": -750,
-            "recommended": "безразлично",
+            "recommended": NO_PREFERENCE_TEXT,
             "time_limit": 20,
-            "explanation": "С точки зрения ожидания варианты одинаковы: −750 и −750. Но многие выбирают Г, надеясь избежать потери.",
+            "explanation": (
+                "С точки зрения ожидания варианты одинаковы: −750 и −750. "
+                "Но многие выбирают Г, надеясь избежать потери."
+            ),
             "lesson": "При потерях даже равные варианты переживаются неравно.",
         },
         {
@@ -291,51 +351,63 @@ def get_risk_games():
             "subtitle": "Выберите между:",
             "left_label": "АГ",
             "right_label": "БВ",
-            "left_text": "25%-ный шанс выиграть 240 долларов и 75%-ный шанс потерять 760 долларов",
-            "right_text": "25%-ный шанс выиграть 250 долларов и 75%-ный шанс потерять 750 долларов",
+            "left_text": (
+                "25%-ный шанс выиграть 240 долларов и 75%-ный шанс "
+                "потерять 760 долларов"
+            ),
+            "right_text": (
+                "25%-ный шанс выиграть 250 долларов и 75%-ный шанс "
+                "потерять 750 долларов"
+            ),
             "left_ev": -510,
             "right_ev": -500,
             "recommended": "БВ",
             "time_limit": 30,
-            "explanation": "Очевидно, что вариант БВ лучше: выигрыши больше, потери меньше, а шансы равны. При этом АГ эквивалентен сочетанию выборов А и Г из игр Решений 1 и 2, а эти варианты люди выбирают крйне редко.",
-            "lesson": "Игры лучше рассматривать в более широких рамках, так ваша прибыль на дистанции будет больше.",
+            "explanation": (
+                "Очевидно, что вариант БВ лучше: выигрыши больше, "
+                "потери меньше, а шансы равны. При этом АГ эквивалентен "
+                "сочетанию выборов А и Г из игр Решений 1 и 2."
+            ),
+            "lesson": (
+                "Игры лучше рассматривать в более широких рамках: "
+                "так прибыль на дистанции обычно выше."
+            ),
         },
     ]
 
 
 def analyze_risk_profile(results):
+    """Analyze user decisions in risk games."""
     skipped = 0
     mathematically_better = 0
     certainty_pref = 0
     risk_seeking_losses = 0
     contradiction_flag = False
-
     picked = {}
 
     for item in results:
-        if item["selected"] == "нет ответа":
+        selected = item["selected"]
+        group = item["group"]
+
+        if selected == NO_ANSWER_TEXT:
             skipped += 1
 
         if item["is_correct"]:
             mathematically_better += 1
 
-        if item["group"] in ["fourfold_high_gain", "classic_1"] and item["selected"] in ["Б", "А"]:
+        if group in {"fourfold_high_gain", "classic_1"} and selected in {"А", "Б"}:
             certainty_pref += 1
 
-        if item["group"] in ["fourfold_high_loss", "classic_2"] and item["selected"] in ["А", "Г"]:
+        if group in {"fourfold_high_loss", "classic_2"} and selected in {"А", "Г"}:
             risk_seeking_losses += 1
 
-        picked[item["group"]] = item["selected"]
+        picked[group] = selected
 
-    if picked.get("classic_1") == "А" and picked.get("classic_2") == "Г" and picked.get("classic_3") == "БВ":
-        contradiction_flag = True
-
-    if mathematically_better >= 7:
-        summary = "Ты часто ориентируешься на математическое ожидание, даже когда интуиция толкает к более комфортному выбору."
-    elif mathematically_better >= 4:
-        summary = "У тебя смешанный стиль: часть решений опирается на математику, часть — на интуицию и форму подачи."
-    else:
-        summary = "Ты часто следуешь интуитивной реакции на риск и определённость, даже когда математика предлагает иной выбор."
+    contradiction_flag = (
+        picked.get("classic_1") == "А"
+        and picked.get("classic_2") == "Г"
+        and picked.get("classic_3") == "БВ"
+    )
 
     return {
         "skipped": skipped,
@@ -343,5 +415,34 @@ def analyze_risk_profile(results):
         "certainty_pref": certainty_pref,
         "risk_seeking_losses": risk_seeking_losses,
         "contradiction_flag": contradiction_flag,
-        "summary": summary,
+        "summary": _build_risk_summary(mathematically_better),
     }
+
+
+def _iter_bias_rows():
+    """Yield parsed rows from the CSV file without the header."""
+    with DATA_FILE_PATH.open("r", encoding="utf-8") as file:
+        for line in file.readlines()[1:]:
+            stripped_line = line.strip()
+            if stripped_line:
+                yield stripped_line.split(";")
+
+
+def _build_risk_summary(mathematically_better):
+    """Return a short summary for the risk profile."""
+    if mathematically_better >= 7:
+        return (
+            "Ты часто ориентируешься на математическое ожидание, "
+            "даже когда интуиция толкает к более комфортному выбору."
+        )
+
+    if mathematically_better >= 4:
+        return (
+            "У тебя смешанный стиль: часть решений опирается на математику, "
+            "часть — на интуицию и форму подачи."
+        )
+
+    return (
+        "Ты часто следуешь интуитивной реакции на риск и определённость, "
+        "даже когда математика предлагает иной выбор."
+    )
