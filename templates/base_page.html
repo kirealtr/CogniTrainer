@@ -1,33 +1,40 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>{% block pagetitle %}{% endblock %}</title>
-    <!-- load static -->
-    {% load static %}
-    <!-- CSS -->
-    <link href="{% static 'bootstrap.min.css' %}" rel="stylesheet">
+    <title>{% block page-title %}Think Slow{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
-<main>
-    <div class="container">
-        <header class="border-bottom">
-            <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
-                <div class="fs-2 mb-3">
-                    <img src="{% static 'calculator.svg' %}" alt="Проект про математику" width="32" height="32"/>
-                    <span>Проект про математику</span>
-                </div>
-            </a>
-        </header>
-        <div class="p-5 mb-4 bg-light rounded-3" id="title-box">
-            <div class="container-fluid py-5">
-                <h1 class="display-1 fw-bold">{% block page-title %}{% endblock %}</h1>
-                <p class="col-md-8 fs-4">{% block page-lead %}{% endblock %}</p>
+    <header class="site-header">
+        <div class="container">
+            <div class="top-row">
+                <div class="brand">Think Slow</div>
+                <nav class="menu">
+                    <a href="/">Главная</a>
+                    <a href="/terms-list">Список искажений</a>
+                    <a href="/add-term">Добавить карточку</a>
+                    <a href="/quiz">Квиз</a>
+                    <a href="/stats">Статистика</a>
+                </nav>
             </div>
         </div>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <h1>{% block hero-title %}{% endblock %}</h1>
+            <p class="lead">{% block page-lead %}{% endblock %}</p>
+        </section>
+
         {% block content %}{% endblock %}
-        <footer class="footer pt-3 mt-4 text-muted border-top">© 2023</footer>
-    </div>
-</main>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            Учебный проект на Django · 2026
+        </div>
+    </footer>
 </body>
 </html>

@@ -1,50 +1,46 @@
 {% extends "base_page.html" %}
 
-{% block page-title %}
-Статистика по терминам
-{% endblock %}
-
+{% block page-title %}Статистика{% endblock %}
+{% block hero-title %}Статистика по материалам{% endblock %}
 {% block page-lead %}
-Перед тем, как отрендерить эту страницу, веб-приложение ходит в файл/БД, обновляет статистики, а затем подставляет их в шаблон страницы.
-Всё это можно посмотреть в файле <code>views.py</code>.
+Здесь показаны общие показатели по собранным карточкам.
 {% endblock %}
 
 {% block content %}
-<div class="container px-4 py-5" id="stats">
-    <div>
-        <h3 class="py-2">Количество терминов</h3>
+<div class="card-grid">
+    <div class="card">
+        <h2>Общее количество карточек</h2>
+        <p class="big-number">{{ terms_all }}</p>
     </div>
-    <div class="row text-center">
-        <div class="col-md-4">
-            <h4>{{ terms_all }}</h4>
-            <p class="text-muted">всего</p>
-        </div>
-        <div class="col-md-4">
-            <h4>{{ terms_own }}</h4>
-            <p class="text-muted">изначально бывших в базе</p>
-        </div>
-        <div class="col-md-4">
-            <h4>{{ terms_added }}</h4>
-            <p class="text-muted">добавленных через <a href="/add-term">форму добавления термина</a></p>
-        </div>
+
+    <div class="card">
+        <h2>Базовые карточки</h2>
+        <p class="big-number">{{ terms_own }}</p>
     </div>
-    <div>
-        <h3 class="py-2">Описания</h3>
+
+    <div class="card">
+        <h2>Карточки пользователей</h2>
+        <p class="big-number">{{ terms_added }}</p>
     </div>
-    <div class="row text-center">
-        <div class="col-md-4">
-            <h4>{{ words_avg }}</h4>
-            <p class="text-muted">слов в среднем</p>
-        </div>
-        <div class="col-sm-4">
-            <h4>{{ words_max }}</h4>
-            <p class="text-muted">максимум</p>
-        </div>
-        <div class="col-sm-4">
-            <h4>{{ words_min }}</h4>
-            <p class="text-muted">минимум</p>
-        </div>
+
+    <div class="card">
+        <h2>Средняя длина объяснения</h2>
+        <p class="big-number">{{ words_avg }}</p>
+    </div>
+
+    <div class="card">
+        <h2>Максимальная длина объяснения</h2>
+        <p class="big-number">{{ words_max }}</p>
+    </div>
+
+    <div class="card">
+        <h2>Минимальная длина объяснения</h2>
+        <p class="big-number">{{ words_min }}</p>
+    </div>
+
+    <div class="card">
+        <h2>Средняя длина примера</h2>
+        <p class="big-number">{{ example_avg }}</p>
     </div>
 </div>
 {% endblock %}
-

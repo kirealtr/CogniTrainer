@@ -1,0 +1,33 @@
+{% extends "base_page.html" %}
+
+{% block page-title %}Квиз{% endblock %}
+{% block hero-title %}Проверка знаний{% endblock %}
+{% block page-lead %}
+Ответь на вопросы и проверь, насколько хорошо ты различаешь когнитивные ошибки и статистические эффекты.
+{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <form action="/quiz" method="post">
+        {% csrf_token %}
+
+        <label for="user_name">Твоё имя</label>
+        <input type="text" id="user_name" name="user_name" placeholder="Например, Илья">
+
+        {% for question in questions %}
+        <div class="question-block">
+            <h3>{{ forloop.counter }}. {{ question.question }}</h3>
+
+            {% for option in question.options %}
+            <label class="radio-label">
+                <input type="radio" name="question_{{ question.id }}" value="{{ option }}" required>
+                {{ option }}
+            </label>
+            {% endfor %}
+        </div>
+        {% endfor %}
+
+        <button class="btn" type="submit">Проверить ответы</button>
+    </form>
+</div>
+{% endblock %}

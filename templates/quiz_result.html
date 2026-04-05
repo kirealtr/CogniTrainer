@@ -1,0 +1,36 @@
+{% extends "base_page.html" %}
+
+{% block page-title %}Результат квиза{% endblock %}
+{% block hero-title %}Результаты квиза{% endblock %}
+{% block page-lead %}
+Ниже показан твой итоговый результат и разбор ответов.
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    {% if user_name %}
+        <p><strong>Пользователь:</strong> {{ user_name }}</p>
+    {% endif %}
+    <p class="big-number">{{ score }} / {{ total }}</p>
+</div>
+
+{% for item in results %}
+<div class="card result-card">
+    <h3>{{ forloop.counter }}. {{ item.question }}</h3>
+
+    {% if item.is_correct %}
+        <p class="success-text"><strong>Верно.</strong> Твой ответ: {{ item.selected }}</p>
+    {% else %}
+        <p class="error-text"><strong>Неверно.</strong> Твой ответ: {{ item.selected }}</p>
+        <p><strong>Правильный ответ:</strong> {{ item.correct }}</p>
+    {% endif %}
+
+    <p><strong>Пояснение:</strong> {{ item.explanation }}</p>
+</div>
+{% endfor %}
+
+<div class="button-row">
+    <a class="btn" href="/quiz">Пройти ещё раз</a>
+    <a class="btn btn-secondary" href="/terms-list">Перейти к карточкам</a>
+</div>
+{% endblock %}
