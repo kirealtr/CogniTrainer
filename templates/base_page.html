@@ -16,8 +16,24 @@
                     <a href="/biases-list">Список искажений</a>
                     <a href="/add-bias">Добавить карточку</a>
                     <a href="/quiz">Квиз</a>
+                    <a href="/risk-game">Игры с риском</a>
                     <a href="/stats">Статистика</a>
                 </nav>
+                <div class="user-box">
+                    {% if request.session.user_name %}
+                        <span class="user-name">Пользователь: {{ request.session.user_name }}</span>
+                        <form action="/clear-user-name" method="post" class="inline-form">
+                            {% csrf_token %}
+                            <button type="submit" class="small-btn">Сменить</button>
+                        </form>
+                    {% else %}
+                        <form action="/set-user-name" method="post" class="inline-form">
+                            {% csrf_token %}
+                            <input type="text" name="global_user_name" placeholder="Ваше имя" required>
+                            <button type="submit" class="small-btn">Сохранить</button>
+                        </form>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </header>

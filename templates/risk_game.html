@@ -1,0 +1,100 @@
+{% extends "base_page.html" %}
+
+{% block page-title %}Игры с риском{% endblock %}
+{% block hero-title %}Игры с риском и интуиция против математики{% endblock %}
+{% block page-lead %}
+Здесь каждая задача показывает только один выбор за раз. На ответ даётся мало времени, чтобы ты не успевал долго считать. Попробуй заметить, где интуиция расходится с математическим ожиданием.
+{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <form action="/risk-game" method="post" id="risk-form">
+        {% csrf_token %}
+
+
+        {% for game in games %}
+        <div class="risk-block timed-question" data-seconds="{{ game.time_limit }}" style="display: none;">
+            <div class="mini-badge">{{ game.title }}</div>
+            <h3>{{ game.subtitle }}</h3>
+
+            <label class="option-card">
+                <input type="radio" name="game_{{ game.id }}" value="{{ game.left_label }}">
+                <span class="option-letter">{{ game.left_label }}</span>: 
+                <span>{{ game.left_text }}</span>
+            </label>
+
+            <label class="option-card">
+                <input type="radio" name="game_{{ game.id }}" value="{{ game.right_label }}">
+                <span class="option-letter">{{ game.right_label }}</span>: 
+                <span>{{ game.right_text }}</span>
+            </label>
+
+            <p class="timer-text">
+                Осталось времени: <span class="timer-value">{{ game.time_limit }}</span> сек.
+            </p>
+            <p>Вопрос <span class="progress-now">{{ forloop.counter }}</span> из {{ games|length }}</p>
+        </div>
+        {% endfor %}
+
+        <button class="btn" type="submit" id="hidden-submit" style="display:none;">Завершить</button>
+    </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const questions = document.querySelectorAll(".timed-question");
+    const submitBtn = document.getElementById("hidden-submit");
+
+    let currentIndex = 0;
+    let currentTimer = null;
+
+    function stopTimer() {
+        if (currentTimer !== null) {
+            clearInterval(currentTimer);
+            currentTimer = null;
+        }
+    }
+
+    function showQuestion(index) {
+        stopTimer();
+
+        if (index >= questions.length) {
+            submitBtn.click();
+            return;
+        }
+
+        questions.forEach((question, i) => {
+            question.style.display = i === index ? "block" : "none";
+        });
+
+        const currentQuestion = questions[index];
+        const timerElement = currentQuestion.querySelector(".timer-value");
+        let secondsLeft = parseInt(currentQuestion.dataset.seconds);
+
+        timerElement.textContent = secondsLeft;
+
+        currentTimer = setInterval(function () {
+            secondsLeft -= 1;
+            timerElement.textContent = secondsLeft;
+
+            if (secondsLeft <= 0) {
+                stopTimer();
+                currentIndex += 1;
+                showQuestion(currentIndex);
+            }
+        }, 1000);
+
+        const answers = currentQuestion.querySelectorAll("input[type='radio']");
+        answers.forEach(function (answer) {
+            answer.addEventListener("change", function () {
+                stopTimer();
+                currentIndex += 1;
+                showQuestion(currentIndex);
+            }, { once: true });
+        });
+    }
+
+    showQuestion(currentIndex);
+});
+</script>
+{% endblock %}

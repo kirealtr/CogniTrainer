@@ -1,0 +1,60 @@
+{% extends "base_page.html" %}
+
+{% block page-title %}Результаты игр{% endblock %}
+{% block hero-title %}Результаты игр с риском{% endblock %}
+{% block page-lead %}
+Здесь видно, где ты выбрал более выгодный по ожиданию вариант, а где форма подачи и определённость могли повлиять сильнее математики.
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    {% if user_name %}
+        <p><strong>Пользователь:</strong> {{ user_name }}</p>
+    {% endif %}
+    <p class="big-number">{{ score }} / {{ total }}</p>
+    <p>{{ profile.summary }}</p>
+
+    {% if profile.contradiction_flag %}
+        <p class="error-text">
+            <strong>Важно:</strong> у тебя получилась классическая комбинация
+            А в Решении 1, Г в Решении 2 и БВ в Решении 3.
+            Это и есть учебный пример внутренне противоречивого выбора.
+        </p>
+    {% endif %}
+</div>
+
+<div class="card-grid">
+    <div class="card">
+        <h2>Сводка</h2>
+        <p><strong>Выборов по математическому ожиданию:</strong> {{ profile.mathematically_better }}</p>
+        <p><strong>Пропущено из-за таймера:</strong> {{ profile.skipped }}</p>
+        <p><strong>Тяга к определённости в выигрышах:</strong> {{ profile.certainty_pref }}</p>
+        <p><strong>Тяга к риску в потерях:</strong> {{ profile.risk_seeking_losses }}</p>
+    </div>
+</div>
+
+{% for item in results %}
+<div class="card result-card">
+    <div class="mini-badge">{{ item.title }}</div>
+    <p><strong>{{ item.left_label }}:</strong> {{ item.left_text }}</p>
+    <p><strong>{{ item.right_label }}:</strong> {{ item.right_text }}</p>
+    <p><strong>Ожидаемое значение:</strong> {{ item.left_label }} = {{ item.left_ev }}, {{ item.right_label }} = {{ item.right_ev }}</p>
+    <p><strong>Твой выбор:</strong> {{ item.selected }}</p>
+
+    {% if item.is_correct %}
+        <p class="success-text"><strong>Математически удачный выбор.</strong></p>
+    {% else %}
+        <p class="error-text"><strong>Интуиция увела от более выгодного варианта.</strong></p>
+    {% endif %}
+
+    <p><strong>Лучший ответ для тренировки:</strong> {{ item.recommended }}</p>
+    <p><strong>Смысл:</strong> {{ item.lesson }}</p>
+    <p><strong>Пояснение:</strong> {{ item.explanation }}</p>
+</div>
+{% endfor %}
+
+<div class="button-row">
+    <a class="btn" href="/risk-game">Пройти ещё раз</a>
+    <a class="btn btn-secondary" href="/">На главную</a>
+</div>
+{% endblock %}

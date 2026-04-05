@@ -11,9 +11,6 @@
     <form action="/send-bias" method="post">
         {% csrf_token %}
 
-        <label for="name">Твоё имя</label>
-        <input type="text" id="name" name="name" placeholder="Например, Анна">
-
         <label for="new_bias">Название искажения</label>
         <input type="text" id="new_bias" name="new_bias" placeholder="Например, Ошибка подтверждения" required>
 

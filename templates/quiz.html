@@ -11,9 +11,6 @@
     <form action="/quiz" method="post">
         {% csrf_token %}
 
-        <label for="user_name">Твоё имя</label>
-        <input type="text" id="user_name" name="user_name" placeholder="Например, Илья">
-
         {% for question in questions %}
         <div class="question-block">
             <h3>{{ forloop.counter }}. {{ question.question }}</h3>

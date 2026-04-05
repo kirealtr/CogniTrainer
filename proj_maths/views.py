@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from . import biases_work
 
 
@@ -17,7 +17,7 @@ def add_bias(request):
 
 def send_bias(request):
     if request.method == "POST":
-        user_name = request.POST.get("name", "").strip()
+        user_name = request.session.get("user_name", "")
         title = request.POST.get("new_bias", "").strip()
         description = request.POST.get("new_definition", "").strip()
         example = request.POST.get("example", "").strip()
@@ -62,7 +62,7 @@ def quiz_view(request):
     questions = biases_work.get_quiz_questions()
 
     if request.method == "POST":
-        user_name = request.POST.get("user_name", "").strip()
+        user_name = request.session.get("user_name", "")
         score = 0
         results = []
 
@@ -90,3 +90,67 @@ def quiz_view(request):
         return render(request, "quiz_result.html", context)
 
     return render(request, "quiz.html", {"questions": questions})
+
+def risk_game_view(request):
+    games = biases_work.get_risk_games()
+
+    if request.method == "POST":
+        user_name = request.session.get("user_name", "")
+        score = 0
+        results = []
+
+        for game in games:
+            selected_answer = request.POST.get(f"game_{game['id']}", "")
+
+            if not selected_answer:
+                selected_answer = "нет ответа"
+
+            if game["recommended"] == "безразлично":
+                is_correct = selected_answer != "нет ответа"
+            else:
+                is_correct = selected_answer == game["recommended"]
+
+            if is_correct:
+                score += 1
+
+            results.append({
+                "group": game["group"],
+                "title": game["title"],
+                "subtitle": game["subtitle"],
+                "left_label": game["left_label"],
+                "right_label": game["right_label"],
+                "left_text": game["left_text"],
+                "right_text": game["right_text"],
+                "selected": selected_answer,
+                "recommended": game["recommended"],
+                "is_correct": is_correct,
+                "explanation": game["explanation"],
+                "lesson": game["lesson"],
+                "left_ev": game["left_ev"],
+                "right_ev": game["right_ev"],
+            })
+
+        profile = biases_work.analyze_risk_profile(results)
+
+        context = {
+            "user_name": user_name,
+            "score": score,
+            "total": len(games),
+            "results": results,
+            "profile": profile,
+        }
+        return render(request, "risk_result.html", context)
+
+    return render(request, "risk_game.html", {"games": games})
+
+def set_user_name(request):
+    if request.method == "POST":
+        user_name = request.POST.get("global_user_name", "").strip()
+        user_name = user_name.replace(";", ",")
+        request.session["user_name"] = user_name
+    return redirect(request.META.get("HTTP_REFERER", "/"))
+
+
+def clear_user_name(request):
+    request.session.pop("user_name", None)
+    return redirect(request.META.get("HTTP_REFERER", "/"))

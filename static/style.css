@@ -182,3 +182,98 @@ textarea {
     color: white;
     padding: 16px 0;
 }
+
+.risk-block {
+    background: #ffffff;
+    border: 2px solid #dbe4f3;
+    border-radius: 14px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.timer-text {
+    font-size: 18px;
+    font-weight: bold;
+    color: #c62828;
+    margin: 14px 0;
+}
+
+.active-question {
+    border-color: #1f3c88;
+}
+
+.mini-badge {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: #e5eefc;
+    color: #1f3c88;
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+.option-card {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    margin: 12px 0;
+    cursor: pointer;
+}
+
+.option-card:hover {
+    background: #f8fbff;
+}
+
+.option-letter {
+    display: inline-block;
+    min-width: 34px;
+    text-align: center;
+    padding: 6px 8px;
+    border-radius: 8px;
+    background: #1f3c88;
+    color: white;
+    font-weight: bold;
+}
+
+.user-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.inline-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.inline-form input[type="text"] {
+    width: 160px;
+    padding: 8px 10px;
+    font-size: 14px;
+}
+
+.small-btn {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 8px;
+    background: white;
+    color: #1f3c88;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.small-btn:hover {
+    background: #e5eefc;
+}
+
+.user-name {
+    color: white;
+    font-weight: bold;
+}

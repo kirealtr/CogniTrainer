@@ -25,4 +25,7 @@ urlpatterns = [
     path("send-bias", views.send_bias, name="send_bias"),
     path("stats", views.show_stats, name="stats"),
     path("quiz", views.quiz_view, name="quiz"),
+    path("risk-game", views.risk_game_view, name="risk_game"),
+    path("set-user-name", views.set_user_name, name="set_user_name"),
+    path("clear-user-name", views.clear_user_name, name="clear_user_name"),
 ]
